@@ -1,5 +1,6 @@
 package tests;
 
+
 import io.qameta.allure.*;
 import models.Currency;
 import org.junit.jupiter.api.BeforeEach;

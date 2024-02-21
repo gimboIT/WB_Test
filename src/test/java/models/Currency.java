@@ -1,5 +1,6 @@
 package models;
 
+
 public enum Currency {
     RUB("₽"),
     BYN("р"),
