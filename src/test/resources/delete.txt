@@ -1,0 +1,81 @@
+https://search-goods.wildberries.ru/search?query=             text
+
+
+https://basket-01.wbbasket.ru/vol85/part8552/8552246/info/ru/card.json
+                                 2      4    7
+
+https://basket-02.wbbasket.ru/vol158/part15870/15870137/info/ru/card.json
+https://basket-03.wbbasket.ru/vol357/part35769/35769129/info/ru/card.json
+                                 3      5    8
+
+public class SearchTest {
+    //https://search-goods.wildberries.ru/search?query=
+    //https://basket-01.wbbasket.ru/vol85/part8552/8552246/info/ru/card.json
+    //https://basket-02.wbbasket.ru/vol158/part15870/15870137/info/ru/card.json
+
+    @Test
+    void search() {
+        //Api запрос на поиск книги
+
+        String product = "book";
+        String searchProducts = given()
+                .when()
+                .get("https://search-goods.wildberries.ru/search?query=" + product)
+                .then()
+                .extract().asString();
+
+        System.out.println(searchProducts);
+
+        String firstProduct = searchProducts.split(",")[0].substring(1);
+
+        String one;
+        String two;
+        String three;
+        String oneBook;
+
+        boolean notFound = false;
+
+        if (firstProduct.length() == 7) {
+            one = firstProduct.substring(0, 2);
+            two = firstProduct.substring(0, 4);
+            three = firstProduct;
+            oneBook = given()
+                    .when()
+                    .get("https://basket-01.wbbasket.ru/vol" + one + "/part" + two + "/" + three + "/info/ru/card.json")
+                    .then().extract().asString();
+
+            System.out.println(oneBook);
+        } else {
+            one = firstProduct.substring(0, 3);
+            two = firstProduct.substring(0, 5);
+            three = firstProduct;
+
+            oneBook = given().when()
+                    .get("https://basket-02.wbbasket.ru/vol" + one + "/part" + two + "/" + three + "/info/ru/card.json")
+                    .then()
+                    .extract().asString();
+            notFound = oneBook.contains("404 Not Found");
+            System.out.println(oneBook);
+        }
+        if (notFound) {
+            one = firstProduct.substring(0, 3);
+            two = firstProduct.substring(0, 5);
+            three = firstProduct;
+
+            oneBook = given().
+                    when()
+                    .get("https://basket-03.wbbasket.ru/vol" + one + "/part" + two + "/" + three + "/info/ru/card.json")
+                    .then().extract().asString();
+        }
+
+        JsonPath jsonPath = new JsonPath(oneBook);
+        String jsonBook = jsonPath.getString("subj_name").toLowerCase();
+        System.out.println(jsonBook);
+
+        boolean findProduct = false;
+        if (jsonBook.contains("книги") || jsonBook.contains("книга")) {
+            findProduct = true;
+        }
+        assertTrue(findProduct);
+    }
+}
